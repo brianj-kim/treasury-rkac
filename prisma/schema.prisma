@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  id            Int            @id @default(autoincrement()) @map("ctg_id")
+  isParent      Boolean?
+  depth         String?        @db.Char(3)
+  range         String?        @db.Char(3)
+  name          String?        @db.VarChar(20)
+  detail        String?        @db.VarChar(255)
+  order         Int?           @db.SmallInt
+  expenditures  expenditures[]
+  income_method income[]       @relation("IncomeMethod")
+  income_type   income[]       @relation("IncomeType")
+}
+
+model expenditures {
+  id            Int         @id @default(autoincrement()) @map("exp_id")
+  year          Int?        @db.SmallInt
+  month         Int?        @db.SmallInt
+  day           Int?        @db.SmallInt
+  qt            Int?        @db.SmallInt
+  department    String?     @db.VarChar(50)
+  type          Int?        @map("exp_type")
+  record_amount Int?
+  actual_amount Int?
+  confirmed_by  String?     @db.VarChar(50)
+  claimed_by    String?     @db.VarChar(50)
+  cheque_no     Int?
+  isPaid        Boolean?
+  notes         String?     @db.VarChar(255)
+  created_at    DateTime?   @default(now()) @db.Timestamp(6)
+  paid_at       DateTime?   @db.Timestamp(6)
+  categories    categories? @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoices      invoices[]
+  receipts      receipts[]
+
+  @@index([month])
+  @@index([qt])
+  @@index([year])
+}
+
+model income {
+  id            Int         @id @default(autoincrement()) @map("inc_id")
+  incType       Int?        @map("inc_type")
+  amount        Int?
+  member        Int?
+  year          Int?        @db.SmallInt
+  month         Int?        @db.SmallInt
+  day           Int?        @db.SmallInt
+  qt            Int?        @db.SmallInt
+  notes         String?     @db.VarChar(255)
+  created_at    DateTime?   @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?   @updatedAt @db.Timestamp(6)
+  incMethod     Int?        @map("inc_method")
+  income_method categories? @relation("IncomeMethod", fields: [incMethod], references: [id])
+  income_type   categories? @relation("IncomeType", fields: [incType], references: [id])
+  members       members?    @relation(fields: [member], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([month])
+  @@index([qt])
+  @@index([year])
+}
+
+model invoices {
+  id           Int           @id @default(autoincrement()) @map("inv_id")
+  date         String?       @db.VarChar(10)
+  item         String?       @db.VarChar(100)
+  details      String?       @db.VarChar(255)
+  amount       Int?
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+  exp_id       Int?
+  expenditures expenditures? @relation(fields: [exp_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model members {
+  id          Int       @id @default(autoincrement()) @map("mbr_id")
+  name_full   String?   @db.VarChar(20)
+  address     String?   @db.VarChar(50)
+  city        String?   @db.VarChar(20)
+  province    String?   @db.VarChar(20)
+  postal      String?   @db.VarChar(7)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  name_detail String?   @db.VarChar(255)
+  income      income[]
+}
+
+model receipts {
+  id           Int           @id @default(autoincrement()) @map("rcp_id")
+  exp_id       Int?
+  file_path    String?       @db.VarChar(255)
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+  expenditures expenditures? @relation(fields: [exp_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
