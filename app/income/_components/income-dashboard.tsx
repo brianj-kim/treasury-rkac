@@ -134,7 +134,7 @@ const IncomeDashboard = () => {
         </div>
         <div >
           <Button asChild className='mb-2 mr-2'>
-            <Link href="/income/new">Add Income</Link>
+            <Link href="/income/create">Add Income</Link>
           </Button>
 
           <Button asChild className='mb-2'>

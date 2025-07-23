@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model categories {
+model Category {
   id            Int            @id @default(autoincrement()) @map("ctg_id")
   isParent      Boolean?
   depth         String?        @db.Char(3)
@@ -15,12 +15,12 @@ model categories {
   name          String?        @db.VarChar(20)
   detail        String?        @db.VarChar(255)
   order         Int?           @db.SmallInt
-  expenditures  expenditures[]
-  income_method income[]       @relation("IncomeMethod")
-  income_type   income[]       @relation("IncomeType")
+  expenditures  Expenditure[]
+  income_method Income[]       @relation("IncomeMethod")
+  income_type   Income[]       @relation("IncomeType")
 }
 
-model expenditures {
+model Expenditure {
   id            Int         @id @default(autoincrement()) @map("exp_id")
   year          Int?        @db.SmallInt
   month         Int?        @db.SmallInt
@@ -37,16 +37,15 @@ model expenditures {
   notes         String?     @db.VarChar(255)
   created_at    DateTime?   @default(now()) @db.Timestamp(6)
   paid_at       DateTime?   @db.Timestamp(6)
-  categories    categories? @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  invoices      invoices[]
-  receipts      receipts[]
+  categories    Category? @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoices      Invoice[]
 
   @@index([month])
   @@index([qt])
   @@index([year])
 }
 
-model income {
+model Income {
   id            Int         @id @default(autoincrement()) @map("inc_id")
   incType       Int?        @map("inc_type")
   amount        Int?
@@ -59,16 +58,16 @@ model income {
   created_at    DateTime?   @default(now()) @db.Timestamp(6)
   updated_at    DateTime?   @updatedAt @db.Timestamp(6)
   incMethod     Int?        @map("inc_method")
-  income_method categories? @relation("IncomeMethod", fields: [incMethod], references: [id])
-  income_type   categories? @relation("IncomeType", fields: [incType], references: [id])
-  members       members?    @relation(fields: [member], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  income_method Category? @relation("IncomeMethod", fields: [incMethod], references: [id])
+  income_type   Category? @relation("IncomeType", fields: [incType], references: [id])
+  members       Member?    @relation(fields: [member], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([month])
   @@index([qt])
   @@index([year])
 }
 
-model invoices {
+model Invoice {
   id           Int           @id @default(autoincrement()) @map("inv_id")
   date         String?       @db.VarChar(10)
   item         String?       @db.VarChar(100)
@@ -76,25 +75,32 @@ model invoices {
   amount       Int?
   created_at   DateTime?     @default(now()) @db.Timestamp(6)
   exp_id       Int?
-  expenditures expenditures? @relation(fields: [exp_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  expenditures Expenditure? @relation(fields: [exp_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model members {
+model Member {
   id          Int       @id @default(autoincrement()) @map("mbr_id")
-  name_full   String?   @db.VarChar(20)
+  name_kFull  String?   @db.VarChar(20)
+  name_eFirst String?   @db.VarChar(30)
+  name_eLast  String?   @db.VarChar(30)
+  email       String?   @db.VarChar(80)
   address     String?   @db.VarChar(50)
   city        String?   @db.VarChar(20)
   province    String?   @db.VarChar(20)
   postal      String?   @db.VarChar(7)
   created_at  DateTime? @default(now()) @db.Timestamp(6)
   name_detail String?   @db.VarChar(255)
-  income      income[]
+  income      Income[]
+  receipts    Receipt[]
 }
 
-model receipts {
-  id           Int           @id @default(autoincrement()) @map("rcp_id")
-  exp_id       Int?
-  file_path    String?       @db.VarChar(255)
-  created_at   DateTime?     @default(now()) @db.Timestamp(6)
-  expenditures expenditures? @relation(fields: [exp_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Receipt {
+  id           String   @id @default(ulid())
+  memberId     Int
+  member       Member   @relation(fields: [memberId], references: [id])
+  taxYear      Int
+  issueDate    DateTime @default(now())
+  serialNumber Int
+  totalCents   Int
+  pdfUrl       String
 }

@@ -6,7 +6,7 @@ import db from '@/db/db';
 
 export type Member = {
   id: number;
-  name_full: string | null;
+  name_kFull: string | null;
 }
 
 export type IncomeType = {
@@ -27,7 +27,7 @@ export type Note = {
 }
 
 const NewIncomePage = async () => {
-  const incomeTypes: IncomeType[] = await db.categories.findMany({
+  const incomeTypes: IncomeType[] = await db.category.findMany({
       select: {
         id: true,
         name: true,
@@ -37,7 +37,7 @@ const NewIncomePage = async () => {
       orderBy: { order: 'asc'}
     });
 
-    const incomeMethods: IncomeMethod[] = await db.categories.findMany({
+    const incomeMethods: IncomeMethod[] = await db.category.findMany({
       select: {
         id: true, 
         name: true,
@@ -47,10 +47,10 @@ const NewIncomePage = async () => {
       orderBy: { order: 'asc'}
     })
 
-    const members: Member[] = await db.members.findMany({
+    const members: Member[] = await db.member.findMany({
       select: {
         id: true,
-        name_full: true
+        name_kFull: true
       },
       orderBy: { id: 'desc' }
     });

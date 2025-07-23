@@ -109,7 +109,7 @@ ORDER BY year, month, day desc;
 ALTER VIEW income_list
 RENAME member TO name;
 
-INSERT INTO "public"."categories" ("ctg_id", "isParent", "depth", "range", "name", "detail", "order") VALUES
+INSERT INTO "public"."Category" ("ctg_id", "isParent", "depth", "range", "name", "detail", "order") VALUES
 (1, 't', '100', 'inc', 'Ministry', '주일헌금', 1),
 (2, 't', '100', 'inc', 'Thanks', '감사헌금', 2),
 (3, 't', '100', 'inc', 'Tithe', '십일조', 3),
@@ -117,3 +117,11 @@ INSERT INTO "public"."categories" ("ctg_id", "isParent", "depth", "range", "name
 (5, 't', '100', 'inc', 'Share', '나눔헌금', 5),
 (6, 't', '100', 'inc', 'Bank', '은행수입 (이자 등)', 6),
 (7, 't', '100', 'inc', 'ETC', '기타', 7);
+
+
+INSERT INTO "public"."Category" ("ctg_id", "isParent", "depth", "range", "name", "detail", "order") VALUES
+(8, 't', '100', 'imd', 'Cash', '현금', 1),
+(9, 't', '100', 'imd', 'Cheque', '수표', 2),
+(10, 't', '100', 'imd', 'E-Transfer', '이트랜스퍼', 3),
+(11, 't', '100', 'imd', 'Credit', '신용카드', 4),
+(12, 't', '100', 'imd', 'Foreign', '외환', 5)

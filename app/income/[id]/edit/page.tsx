@@ -28,10 +28,11 @@ const IncomeEditPage = async ({
 
   const memberName = await getMemberName(incomeEntry!.member!);
 
-  const incomeTypes: IncomeType[] = await db.categories.findMany({
+  const incomeTypes: IncomeType[] = await db.category.findMany({
     select: {
       id: true,
-      name: true
+      name: true,
+      detail: true
     },
     where: { range : 'inc' },
     orderBy: { order: 'asc'}
